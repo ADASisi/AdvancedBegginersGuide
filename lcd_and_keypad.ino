@@ -20,37 +20,71 @@ byte colPins[COLS] = {10,11,12,13};
 Keypad customKeypad = Keypad(makeKeymap(hexaKeys), rowPins, colPins, ROWS, COLS); 
 
 String combination;
-int pass=1234;
+
+int flag=0;
+int pass;
+
 void setup() {
-  // Switch on the LCD screen
+  randomSeed(analogRead(0));
+  pass=random(1000,10000);
   lcd.begin(16, 2);
   lcd.setCursor(0, 0);
-  lcd.print("Input pass: ");
+  lcd.print("Input pass|");
+  lcd.print(pass,HEX);
+  lcd.print("|");
+  lcd.setCursor(0, 1);
+  lcd.print(">");
+
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
   char Key = customKeypad.getKey();
-  
-   if(Key=='#'){
-     int combo=combination.toInt();
-     Serial.println(combo);
-     if(combo==pass){
-      lcd.clear();
-      lcd.setCursor(4, 0);
-      lcd.print("Correct!"); 
-     }else{
-      lcd.clear();
-      lcd.setCursor(3, 0);
-      lcd.print("Incorrect!");
-      delay(1250);
+
+
+   if(Key=='*' && flag==0){
       lcd.clear();
       lcd.setCursor(0, 0);
       lcd.print("Input pass: ");
       combination='\0';
+     //delet
+   }else if(flag==1 && Key=='A'){
+
+      lcd.clear();
+      lcd.setCursor(0, 0);
+      lcd.print("Input pass: ");
+      combination='\0';   
+      flag=0;
+     //full reset
+    }else if(Key=='#'){
+     int combo=combination.toInt();
+     Serial.println(combo);
+
+      if(combo==pass){
+
+      lcd.clear();
+      lcd.setCursor(4, 0);
+      lcd.print("Correct!"); 
+      flag=1;
+
+      }else{
+
+      lcd.clear();
+      lcd.setCursor(3, 0);
+      lcd.print("Incorrect!");
+      delay(1250);
+
+      lcd.clear();
+      lcd.setCursor(0, 0);
+      lcd.print("Input pass: ");
+      combination='\0';
+      
      }
+
     }else if (Key){
+
     lcd.print(Key);
     combination+=Key;
+
    }
 }
